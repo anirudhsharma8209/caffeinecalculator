@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+
+<body onload="return fetchCoffees()">    
+    <form onsubmit="return validation()">
+        <div class="container bg-light d-flex justify-content-center align-items-center">
+            <div class="card bg-light col-lg-5 rounded-3 lead fw-bold p-2 h-75 m-4">
+                <label for="">Choose a coffee</label>
+                <select name="" id="selectCoffee" onchange="fetchSelectedCoffee()" class="form-select mt-2">
+                    <option value="">Select Coffee</option>
+                </select>
+                <label for="" class="mt-3">Your Weight</label>
+                <div class="weight col-lg-8 d-flex justify-content-around align-items-center">
+                    <div class="input_box col-lg-3  ">
+                        <input type="tel" id="weight" class="form-control col-lg-3" minn="1" max="100">
+                    </div>
+                    <input type="radio" name="weight" class="form-check-input" id="" checked> Pounds
+                    <input type="radio" name="weight" class="form-check-input" id=""> Kilos
+                </div>
+                <div class="caffeine mt-3">
+                    Your Caffeine Sensitivity
+                    <div class="input_group mt-3 col-lg-7 fw-normal d-flex justify-content-between">
+                        <span style="font-size: 12px; text-align: justify;">
+                            More <br /> Tolrant
+                        </span>
+                        <span class="d-block" style="font-size: 12px;">
+                            <br />Normal
+                        </span>
+                        <span style="font-size: 12px;">
+                            More <br /> Sensitive
+                        </span>
+                    </div>
+                    <div class="input_groups justify-content-between align-items-center">
+                        <input type="radio" name="caffeine" id="" class="form-check-input p-3">
+                        <input type="radio" name="caffeine" id="" class="form-check-input p-3"
+                            style="margin-left: 15px;">
+                        <input type="radio" checked name="caffeine" id="" class="form-check-input p-3"
+                            style="margin-left: 13px;">
+                        <input type="radio" name="caffeine" id="" class="form-check-input p-3"
+                            style="margin-left: 13px;">
+                        <input type="radio" name="caffeine" id="" class="form-check-input p-3"
+                            style="margin-left: 15px;">
+                    </div>
+                    <div class="button mt-3 p-0 m-3">
+                        <button class="btn w-100 text-white fw-bold"
+                            style="height: 50px; background-image: linear-gradient(#ff5858, #f857a6); font-size: 20px;"
+                            onclick="openModal(); ">How Much Coffee?</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-dark col-lg-5 mt-5 text-white" id="modal" style="display: none; height: 200px;">
+                <div class="errorBlock  d-flex justify-content-center align-items-center">
+                    <h1 id="errorMsg" align="center"></h1>
+                </div>
+                <div id="successMsg" class="p-1" style="display: none;">
+                    <span id="dailyintake">DAILY COFFEE MAXIMUM</span>
+                    <h5>Aim for no more than <span id='setAim'> </span> cups per day.
+
+                    <div class="img_container">
+                        <img id="setImage" class="img-fluid m-2" style="height: 120px; width: 150px;"  />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>    
+    <script>
+        let getSelect = document.getElementById('selectCoffee');
+        let completeCoffees = [];
+        const fetchCoffees = async () => {
+            let coffeesData = await fetch("./coffees.json");        
+            let reciver = await coffeesData.json();
+            for(i of reciver){
+                completeCoffees.push(i);
+                let option = document.createElement('option');                
+                option.innerText = i.title
+                option.setAttribute('value', `${i.title}`)
+                getSelect.append(option);
+            }                        
+            return false;
+        }           
+
+        const fetchSelectedCoffee = () => {                                    
+            for(i of completeCoffees){                
+                if(getSelect.value == i.title){
+                    console.log(i);
+                    document.getElementById('setImage').setAttribute('src', `${i.image}`)
+                    return
+                }
+            }
+        }
+
+
+        const calculateCaffeine = () => {
+            let weight = document.getElementById('weight');
+            let radiosBtn = document.getElementsByName('caffeine');
+            let weightRadio = document.getElementsByName('weight');
+            let finalWeight;
+            if(weightRadio[1].checked){
+                if(radiosBtn[4].checked){
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = weight.value * 2.5 / 100;
+                }else if(radiosBtn[3].checked){                
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = weight.value * 3 / 100;
+                }else if(radiosBtn[2].checked){
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = weight.value * 3.5 / 100;
+                }else{
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = weight.value * 4 / 100;
+                }                                
+            }else{
+                let poundsToKG = Math.floor(weight.value / 2.2046);
+                if(radiosBtn[4].checked){
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = poundsToKG * 2.5 / 100;
+                }else if(radiosBtn[3].checked){                
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = poundsToKG * 3 / 100;
+                }else if(radiosBtn[2].checked){
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = poundsToKG * 3.5 / 100;
+                }else{
+                    successMsg.setAttribute('style', "display: block;")
+                    finalWeight = poundsToKG * 4 / 100;
+                }                
+            }
+            document.getElementById('setAim').innerHTML = finalWeight;
+        }   
+
+
+        const openModal = () => document.getElementById('modal').setAttribute('style', 'display: block');
+
+
+        const validation = () => {
+            let selectOption = document.getElementById('selectCoffee');
+            let selectWeight = document.getElementById('weight');
+            let successMsg = document.getElementById('successMsg');            
+            let errorMsg = document.getElementById('errorMsg');
+            if (selectOption.value == '') {
+                errorMsg.innerText = "";
+                errorMsg.innerText = "Go on. Enter something. Don't be shy."
+            } else if (selectWeight.value == '') {
+                errorMsg.innerText = "";
+                errorMsg.innerText = "You really should enter your weight.";
+            }else{
+                errorMsg.innerText = "";
+                calculateCaffeine();                
+            }
+
+            return false;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
